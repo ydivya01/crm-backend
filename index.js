@@ -59,9 +59,19 @@ if(!token){
 }
 }
 
-app.get('/', verifyUser,  (req, res)=>{
-return res.json({email:req.email , name:req.name})
-})
+// app.get('/', verifyUser,  (req, res)=>{
+// return res.json({email:req.email , name:req.name})
+// })
+
+app.get('/', (req, res)=>{
+     res.send('CRM Dashboard')
+    })
+
+// app.use("/api/auth", authRoute);
+// app.use("/api", batchRoute);
+// app.get('/', (req,res)=>{
+//   res.send("Zen Class Event Management For Students")
+// })
 
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
