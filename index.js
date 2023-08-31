@@ -6,31 +6,41 @@ const EmployeeModel = require('./model/Employee')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const cookieParser = require('cookie-parser')
-const session = require('express-session')
+// const session = require('express-session')
 const TicketModel = require('./model/TicketModel')
 const UserModel = require('./model/UserModel')
 const multer = require('multer')
 const path = require('path')
+const dotenv = require('dotenv')
 
 
 const app = express()
+dotenv.config();
+
 app.use(express.json())
+
 app.use(cors({
     origin:["http://localhost:3000"],
     methods:["GET", "POST", "PUT", "DELETE"],
     credentials:true
 }))
-// app.use(session({
-//     secret:'secret',
-//     resave:false,
-//     cookie:{ saveUninitialized:false,
-//         maxAge: 1000 * 60 * 60 * 24},
-   
-// }))
+
 app.use(cookieParser())
 app.use(express.static('public'))
 
-mongoose.connect('mongodb://127.0.0.1:27017/CRM')
+// mongoose.connect('mongodb://127.0.0.1:27017/CRM')
+const connect = async () =>{
+    try{
+await mongoose.connect(process.env.MONGO, {dbName:'CRM-db'})
+console.log('mongo connected')
+    }catch (err){
+console.log(err)
+    }
+
+}
+
+
+//127.0.0.1:27017
 
 const verifyUser = (req, res, next) =>{
 const token = req.cookies.token;
@@ -176,7 +186,8 @@ app.get('/logout',(req, res)=>{
 })
 
 
-app.listen(3001, () => {
-    console.log('server is running YYAYY!')
-})
 
+app.listen(process.env.PORT, () => {
+    connect();
+    console.log("server connected  YAYYY!!");
+  });
