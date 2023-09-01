@@ -30,7 +30,7 @@ app.use(express.static('public'))
 
 // mongoose.connect('mongodb://127.0.0.1:27017/CRM')
 const connect = async () =>{
-    try{
+try{
 await mongoose.connect(process.env.MONGO, {dbName:'CRM-db'})
 console.log('mongo connected')
     }catch (err){
@@ -45,7 +45,7 @@ console.log(err)
 const verifyUser = (req, res, next) =>{
 const token = req.cookies.token;
 if(!token){
-    return res.json('The token is missing')
+    return res.json('CRM_DASHBOARD')
 }else{
     jwt.verify(token,'jwt-secret-key', (err, decoded) =>{
         if(err){
@@ -53,25 +53,22 @@ if(!token){
         }else{
             req.email = decoded.email
             req.name = decoded.name
+            req.role = decoded.role
             next()
         }
     })
 }
 }
 
-// app.get('/', verifyUser,  (req, res)=>{
-// return res.json({email:req.email , name:req.name})
-// })
+app.get('/', verifyUser,  (req, res)=>{
+return res.json({email:req.email , name:req.name , role:req.role})
+})
 
-app.get('/', (req, res)=>{
-     res.send('CRM Dashboard')
-    })
+// app.get('/', verifyUser, (req, res)=>{
+//       res.send('CRM_Dashboard')
 
-// app.use("/api/auth", authRoute);
-// app.use("/api", batchRoute);
-// app.get('/', (req,res)=>{
-//   res.send("Zen Class Event Management For Students")
-// })
+//     })
+
 
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
@@ -84,7 +81,7 @@ app.post('/login', (req, res) => {
                             "jwt-secret-key", { expiresIn: '1d' })
                             res.cookie('token', token)
                            
-                            return res.json({Status:'Success', role:user.role})                                                                                                              
+                            return res.json({Status:'Success', role:user.role, name:user.name , email:user.email})                                                                                                              
                     } else {
 
                         return res.json('The passowrd is incorrect')
@@ -96,7 +93,7 @@ app.post('/login', (req, res) => {
             }
         })
 })
-
+ 
 const storage = multer.diskStorage({
     destination:(req, file , cb)=> {
         cb(null, 'public\Images')
@@ -141,6 +138,8 @@ app.post('/register', (req, res) => {
         }).catch(err => res.json(err))
 
 })
+
+
 
 app.get('/gettickets', (req, res)=>{
     TicketModel.find()
